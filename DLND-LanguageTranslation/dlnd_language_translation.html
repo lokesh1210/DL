@@ -12071,16 +12071,7 @@ les états-unis est parfois occupé en janvier , et il est parfois chaud en nove
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>TensorFlow Version: 1.1.0
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\ipykernel_launcher.py:15: UserWarning: No GPU found. Please use a GPU to train your neural network.
-  from ipykernel import kernelapp as app
+Default GPU Device: /gpu:0
 </pre>
 </div>
 </div>
@@ -12416,8 +12407,19 @@ les états-unis est parfois occupé en janvier , et il est parfois chaud en nove
 <span class="sd">    :return: BasicDecoderOutput containing inference logits and sample_id</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: Implement Function</span>
+<span class="c1">#     print(encoder_state)</span>
+<span class="c1">#     print(dec_cell)</span>
+<span class="c1">#     print(dec_embeddings)</span>
+<span class="c1">#     print(start_of_sequence_id)</span>
+<span class="c1">#     print(end_of_sequence_id)</span>
+<span class="c1">#     print(max_target_sequence_length)</span>
+<span class="c1">#     print(vocab_size)</span>
+<span class="c1">#     print(output_layer)</span>
+<span class="c1">#     print(batch_size)</span>
+<span class="c1">#     print(keep_prob)</span>
     
-    <span class="n">start_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">start_of_sequence_id</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)]</span>
+    <span class="c1">#start_tokens = [tf.constant(start_of_sequence_id, dtype=tf.int32) for i in range(batch_size)]</span>
+    <span class="n">start_tokens</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([</span><span class="n">start_of_sequence_id</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),[</span><span class="n">batch_size</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;start_tokens&#39;</span><span class="p">)</span>
     
     <span class="n">inference_helper</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">seq2seq</span><span class="o">.</span><span class="n">GreedyEmbeddingHelper</span><span class="p">(</span><span class="n">dec_embeddings</span><span class="p">,</span> <span class="n">start_tokens</span><span class="p">,</span> <span class="n">end_of_sequence_id</span><span class="p">)</span>
     
@@ -12502,7 +12504,11 @@ les états-unis est parfois occupé en janvier , et il est parfois chaud en nove
 <span class="sd">    :return: Tuple of (Training BasicDecoderOutput, Inference BasicDecoderOutput)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: Implement Function</span>
-    <span class="n">dec_embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">embed_sequence</span><span class="p">(</span><span class="n">dec_input</span><span class="p">,</span> <span class="n">target_vocab_size</span><span class="p">,</span> <span class="n">decoding_embedding_size</span><span class="p">)</span>       
+    <span class="c1">#dec_embed = tf.contrib.layers.embed_sequence(dec_input, target_vocab_size, decoding_embedding_size)    </span>
+    
+    <span class="n">dec_embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_uniform</span><span class="p">([</span><span class="n">target_vocab_size</span><span class="p">,</span> <span class="n">decoding_embedding_size</span><span class="p">]))</span>
+    <span class="n">dec_embed</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">dec_embeddings</span><span class="p">,</span> <span class="n">dec_input</span><span class="p">)</span>
+    
         
     <span class="k">def</span> <span class="nf">build_cell</span><span class="p">(</span><span class="n">rnn_size</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">):</span>
         <span class="n">lstm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">rnn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span><span class="n">rnn_size</span><span class="p">,</span> <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_uniform_initializer</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
@@ -12514,10 +12520,12 @@ les états-unis est parfois occupé en janvier , et il est parfois chaud en nove
     <span class="n">output_layer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">target_vocab_size</span><span class="p">,</span>
                          <span class="n">kernel_initializer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal_initializer</span><span class="p">(</span><span class="n">mean</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
     
-    <span class="n">train_logits</span> <span class="o">=</span> <span class="n">decoding_layer_train</span><span class="p">(</span><span class="n">encoder_state</span><span class="p">,</span> <span class="n">dec_rnn</span><span class="p">,</span> <span class="n">dec_embed</span><span class="p">,</span> <span class="n">target_sequence_length</span><span class="p">,</span> 
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">&quot;decode&quot;</span><span class="p">):</span>
+        <span class="n">train_logits</span> <span class="o">=</span> <span class="n">decoding_layer_train</span><span class="p">(</span><span class="n">encoder_state</span><span class="p">,</span> <span class="n">dec_rnn</span><span class="p">,</span> <span class="n">dec_embed</span><span class="p">,</span> <span class="n">target_sequence_length</span><span class="p">,</span> 
                                         <span class="n">max_target_sequence_length</span><span class="p">,</span> <span class="n">output_layer</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">)</span>
     
-    <span class="n">infer_logits</span> <span class="o">=</span> <span class="n">decoding_layer_infer</span><span class="p">(</span><span class="n">encoder_state</span><span class="p">,</span> <span class="n">dec_rnn</span><span class="p">,</span> <span class="n">dec_embed</span><span class="p">,</span> <span class="n">target_vocab_to_int</span><span class="p">[</span><span class="s1">&#39;&lt;GO&gt;&#39;</span><span class="p">],</span> 
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">&quot;decode&quot;</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">infer_logits</span> <span class="o">=</span> <span class="n">decoding_layer_infer</span><span class="p">(</span><span class="n">encoder_state</span><span class="p">,</span> <span class="n">dec_rnn</span><span class="p">,</span> <span class="n">dec_embeddings</span><span class="p">,</span> <span class="n">target_vocab_to_int</span><span class="p">[</span><span class="s1">&#39;&lt;GO&gt;&#39;</span><span class="p">],</span> 
                                         <span class="n">target_vocab_to_int</span><span class="p">[</span><span class="s1">&#39;&lt;EOS&gt;&#39;</span><span class="p">],</span> <span class="n">max_target_sequence_length</span><span class="p">,</span> 
                                         <span class="n">target_vocab_size</span><span class="p">,</span> <span class="n">output_layer</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">)</span>    
   
@@ -12542,137 +12550,9 @@ les états-unis est parfois occupé en janvier , et il est parfois chaud en nove
 <div class="output_area">
 <div class="prompt"></div>
 
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">merge_with</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    556</span>       <span class="ansi-green-intense-fg ansi-bold">try</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 557</span><span class="ansi-yellow-intense-fg ansi-bold">         </span>self<span class="ansi-yellow-intense-fg ansi-bold">.</span>assert_same_rank<span class="ansi-yellow-intense-fg ansi-bold">(</span>other<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    558</span>         new_dims <span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">assert_same_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    602</span>         raise ValueError(
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 603</span><span class="ansi-yellow-intense-fg ansi-bold">             &#34;Shapes %s and %s must have the same rank&#34; % (self, other))
-</span><span class="ansi-green-fg">    604</span> 
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shapes (64, 22, 200) and (?, ?) must have the same rank
-
-During handling of the above exception, another exception occurred:
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">with_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, rank)</span>
-<span class="ansi-green-fg">    632</span>     <span class="ansi-green-intense-fg ansi-bold">try</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 633</span><span class="ansi-yellow-intense-fg ansi-bold">       </span><span class="ansi-green-intense-fg ansi-bold">return</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>merge_with<span class="ansi-yellow-intense-fg ansi-bold">(</span>unknown_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span>ndims<span class="ansi-yellow-intense-fg ansi-bold">=</span>rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    634</span>     <span class="ansi-green-intense-fg ansi-bold">except</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">merge_with</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    563</span>         raise ValueError(&#34;Shapes %s and %s are not compatible&#34; %
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 564</span><span class="ansi-yellow-intense-fg ansi-bold">                          (self, other))
-</span><span class="ansi-green-fg">    565</span> 
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shapes (64, 22, 200) and (?, ?) are not compatible
-
-During handling of the above exception, another exception occurred:
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-12-e6f067e46475&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">     45</span> DON<span class="ansi-red-fg">&#39;</span>T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
-<span class="ansi-green-fg">     46</span> &#34;&#34;&#34;
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 47</span><span class="ansi-yellow-intense-fg ansi-bold"> </span>tests<span class="ansi-yellow-intense-fg ansi-bold">.</span>test_decoding_layer<span class="ansi-yellow-intense-fg ansi-bold">(</span>decoding_layer<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\DL\RNN\deep-learning\language-translation\problem_unittests.py</span> in <span class="ansi-cyan-fg">test_decoding_layer</span><span class="ansi-blue-intense-fg ansi-bold">(decoding_layer)</span>
-<span class="ansi-green-fg">    185</span>                                                    batch_size<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">    186</span>                                                    keep_prob<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 187</span><span class="ansi-yellow-intense-fg ansi-bold">                                                    embedding_size)
-</span><span class="ansi-green-fg">    188</span> 
-<span class="ansi-green-fg">    189</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-12-e6f067e46475&gt;</span> in <span class="ansi-cyan-fg">decoding_layer</span><span class="ansi-blue-intense-fg ansi-bold">(dec_input, encoder_state, target_sequence_length, max_target_sequence_length, rnn_size, num_layers, target_vocab_to_int, target_vocab_size, batch_size, keep_prob, decoding_embedding_size)</span>
-<span class="ansi-green-fg">     37</span>     infer_logits = decoding_layer_infer(encoder_state, dec_rnn, dec_embed, target_vocab_to_int[&#39;&lt;GO&gt;&#39;], 
-<span class="ansi-green-fg">     38</span>                                         target_vocab_to_int<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-blue-intense-fg ansi-bold">&#39;&lt;EOS&gt;&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> max_target_sequence_length<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 39</span><span class="ansi-yellow-intense-fg ansi-bold">                                         target_vocab_size, output_layer, batch_size, keep_prob)
-</span><span class="ansi-green-fg">     40</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> train_logits<span class="ansi-yellow-intense-fg ansi-bold">,</span> infer_logits
-<span class="ansi-green-fg">     41</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-11-9da2c043077d&gt;</span> in <span class="ansi-cyan-fg">decoding_layer_infer</span><span class="ansi-blue-intense-fg ansi-bold">(encoder_state, dec_cell, dec_embeddings, start_of_sequence_id, end_of_sequence_id, max_target_sequence_length, vocab_size, output_layer, batch_size, keep_prob)</span>
-<span class="ansi-green-fg">     27</span> 
-<span class="ansi-green-fg">     28</span>     inference_output, sample_id = tf.contrib.seq2seq.dynamic_decode(inference_decoder, impute_finished=True,
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 29</span><span class="ansi-yellow-intense-fg ansi-bold">                                                          maximum_iterations = max_target_sequence_length)
-</span><span class="ansi-green-fg">     30</span> 
-<span class="ansi-green-fg">     31</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> inference_output
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\decoder.py</span> in <span class="ansi-cyan-fg">dynamic_decode</span><span class="ansi-blue-intense-fg ansi-bold">(decoder, output_time_major, impute_finished, maximum_iterations, parallel_iterations, swap_memory, scope)</span>
-<span class="ansi-green-fg">    276</span>         ],
-<span class="ansi-green-fg">    277</span>         parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">=</span>parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 278</span><span class="ansi-yellow-intense-fg ansi-bold">         swap_memory=swap_memory)
-</span><span class="ansi-green-fg">    279</span> 
-<span class="ansi-green-fg">    280</span>     final_outputs_ta <span class="ansi-yellow-intense-fg ansi-bold">=</span> res<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">while_loop</span><span class="ansi-blue-intense-fg ansi-bold">(cond, body, loop_vars, shape_invariants, parallel_iterations, back_prop, swap_memory, name)</span>
-<span class="ansi-green-fg">   2621</span>     context <span class="ansi-yellow-intense-fg ansi-bold">=</span> WhileContext<span class="ansi-yellow-intense-fg ansi-bold">(</span>parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">,</span> back_prop<span class="ansi-yellow-intense-fg ansi-bold">,</span> swap_memory<span class="ansi-yellow-intense-fg ansi-bold">,</span> name<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2622</span>     ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>add_to_collection<span class="ansi-yellow-intense-fg ansi-bold">(</span>ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>GraphKeys<span class="ansi-yellow-intense-fg ansi-bold">.</span>WHILE_CONTEXT<span class="ansi-yellow-intense-fg ansi-bold">,</span> context<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2623</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>result <span class="ansi-yellow-intense-fg ansi-bold">=</span> context<span class="ansi-yellow-intense-fg ansi-bold">.</span>BuildLoop<span class="ansi-yellow-intense-fg ansi-bold">(</span>cond<span class="ansi-yellow-intense-fg ansi-bold">,</span> body<span class="ansi-yellow-intense-fg ansi-bold">,</span> loop_vars<span class="ansi-yellow-intense-fg ansi-bold">,</span> shape_invariants<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2624</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> result
-<span class="ansi-green-fg">   2625</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">BuildLoop</span><span class="ansi-blue-intense-fg ansi-bold">(self, pred, body, loop_vars, shape_invariants)</span>
-<span class="ansi-green-fg">   2454</span>       self<span class="ansi-yellow-intense-fg ansi-bold">.</span>Enter<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2455</span>       original_body_result, exit_vars = self._BuildLoop(
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2456</span><span class="ansi-yellow-intense-fg ansi-bold">           pred, body, original_loop_vars, loop_vars, shape_invariants)
-</span><span class="ansi-green-fg">   2457</span>     <span class="ansi-green-intense-fg ansi-bold">finally</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">   2458</span>       self<span class="ansi-yellow-intense-fg ansi-bold">.</span>Exit<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">_BuildLoop</span><span class="ansi-blue-intense-fg ansi-bold">(self, pred, body, original_loop_vars, loop_vars, shape_invariants)</span>
-<span class="ansi-green-fg">   2404</span>         structure<span class="ansi-yellow-intense-fg ansi-bold">=</span>original_loop_vars<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">   2405</span>         flat_sequence=vars_for_body_with_tensor_arrays)
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2406</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>body_result <span class="ansi-yellow-intense-fg ansi-bold">=</span> body<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">*</span>packed_vars_for_body<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2407</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> <span class="ansi-green-intense-fg ansi-bold">not</span> nest<span class="ansi-yellow-intense-fg ansi-bold">.</span>is_sequence<span class="ansi-yellow-intense-fg ansi-bold">(</span>body_result<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">   2408</span>       body_result <span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-yellow-intense-fg ansi-bold">[</span>body_result<span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\decoder.py</span> in <span class="ansi-cyan-fg">body</span><span class="ansi-blue-intense-fg ansi-bold">(time, outputs_ta, state, inputs, finished)</span>
-<span class="ansi-green-fg">    229</span>       &#34;&#34;&#34;
-<span class="ansi-green-fg">    230</span>       (next_outputs, decoder_state, next_inputs,
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 231</span><span class="ansi-yellow-intense-fg ansi-bold">        decoder_finished) = decoder.step(time, inputs, state)
-</span><span class="ansi-green-fg">    232</span>       next_finished <span class="ansi-yellow-intense-fg ansi-bold">=</span> math_ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>logical_or<span class="ansi-yellow-intense-fg ansi-bold">(</span>decoder_finished<span class="ansi-yellow-intense-fg ansi-bold">,</span> finished<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    233</span>       <span class="ansi-green-intense-fg ansi-bold">if</span> maximum_iterations <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">not</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\basic_decoder.py</span> in <span class="ansi-cyan-fg">step</span><span class="ansi-blue-intense-fg ansi-bold">(self, time, inputs, state, name)</span>
-<span class="ansi-green-fg">    138</span>     &#34;&#34;&#34;
-<span class="ansi-green-fg">    139</span>     <span class="ansi-green-intense-fg ansi-bold">with</span> ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>name_scope<span class="ansi-yellow-intense-fg ansi-bold">(</span>name<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-blue-intense-fg ansi-bold">&#34;BasicDecoderStep&#34;</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-yellow-intense-fg ansi-bold">(</span>time<span class="ansi-yellow-intense-fg ansi-bold">,</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 140</span><span class="ansi-yellow-intense-fg ansi-bold">       </span>cell_outputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> cell_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    141</span>       <span class="ansi-green-intense-fg ansi-bold">if</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_output_layer <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">not</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    142</span>         cell_outputs <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_output_layer<span class="ansi-yellow-intense-fg ansi-bold">(</span>cell_outputs<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    951</span>                 state, [0, cur_state_pos], [-1, cell.state_size])
-<span class="ansi-green-fg">    952</span>             cur_state_pos <span class="ansi-yellow-intense-fg ansi-bold">+=</span> cell<span class="ansi-yellow-intense-fg ansi-bold">.</span>state_size
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 953</span><span class="ansi-yellow-intense-fg ansi-bold">           </span>cur_inp<span class="ansi-yellow-intense-fg ansi-bold">,</span> new_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>cur_inp<span class="ansi-yellow-intense-fg ansi-bold">,</span> cur_state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    954</span>           new_states<span class="ansi-yellow-intense-fg ansi-bold">.</span>append<span class="ansi-yellow-intense-fg ansi-bold">(</span>new_state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    955</span>     new_states = (tuple(new_states) if self._state_is_tuple else
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    711</span>                              self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_recurrent_input_noise<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">    712</span>                              self._input_keep_prob)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 713</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>output<span class="ansi-yellow-intense-fg ansi-bold">,</span> new_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">,</span> scope<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    714</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> _should_dropout<span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_state_keep_prob<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    715</span>       new_state = self._dropout(new_state, &#34;state&#34;,
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    391</span> 
-<span class="ansi-green-fg">    392</span>     dtype <span class="ansi-yellow-intense-fg ansi-bold">=</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">.</span>dtype
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 393</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>input_size <span class="ansi-yellow-intense-fg ansi-bold">=</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">.</span>get_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>with_rank<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-cyan-intense-fg ansi-bold">2</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-<span class="ansi-green-fg">    394</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> input_size<span class="ansi-yellow-intense-fg ansi-bold">.</span>value <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    395</span>       <span class="ansi-green-intense-fg ansi-bold">raise</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#34;Could not infer input size from inputs.get_shape()[-1]&#34;</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">with_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, rank)</span>
-<span class="ansi-green-fg">    633</span>       <span class="ansi-green-intense-fg ansi-bold">return</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>merge_with<span class="ansi-yellow-intense-fg ansi-bold">(</span>unknown_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span>ndims<span class="ansi-yellow-intense-fg ansi-bold">=</span>rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    634</span>     <span class="ansi-green-intense-fg ansi-bold">except</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 635</span><span class="ansi-yellow-intense-fg ansi-bold">       </span><span class="ansi-green-intense-fg ansi-bold">raise</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#34;Shape %s must have rank %d&#34;</span> <span class="ansi-yellow-intense-fg ansi-bold">%</span> <span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">,</span> rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    636</span> 
-<span class="ansi-green-fg">    637</span>   <span class="ansi-green-intense-fg ansi-bold">def</span> with_rank_at_least<span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">,</span> rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shape (64, 22, 200) must have rank 2</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Tests Passed
+</pre>
 </div>
 </div>
 
@@ -12697,7 +12577,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">seq2seq_model</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">target_data</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span>
@@ -12750,144 +12630,9 @@ During handling of the above exception, another exception occurred:
 <div class="output_area">
 <div class="prompt"></div>
 
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">merge_with</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    556</span>       <span class="ansi-green-intense-fg ansi-bold">try</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 557</span><span class="ansi-yellow-intense-fg ansi-bold">         </span>self<span class="ansi-yellow-intense-fg ansi-bold">.</span>assert_same_rank<span class="ansi-yellow-intense-fg ansi-bold">(</span>other<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    558</span>         new_dims <span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">assert_same_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    602</span>         raise ValueError(
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 603</span><span class="ansi-yellow-intense-fg ansi-bold">             &#34;Shapes %s and %s must have the same rank&#34; % (self, other))
-</span><span class="ansi-green-fg">    604</span> 
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shapes (64, 22, 100) and (?, ?) must have the same rank
-
-During handling of the above exception, another exception occurred:
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">with_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, rank)</span>
-<span class="ansi-green-fg">    632</span>     <span class="ansi-green-intense-fg ansi-bold">try</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 633</span><span class="ansi-yellow-intense-fg ansi-bold">       </span><span class="ansi-green-intense-fg ansi-bold">return</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>merge_with<span class="ansi-yellow-intense-fg ansi-bold">(</span>unknown_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span>ndims<span class="ansi-yellow-intense-fg ansi-bold">=</span>rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    634</span>     <span class="ansi-green-intense-fg ansi-bold">except</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">merge_with</span><span class="ansi-blue-intense-fg ansi-bold">(self, other)</span>
-<span class="ansi-green-fg">    563</span>         raise ValueError(&#34;Shapes %s and %s are not compatible&#34; %
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 564</span><span class="ansi-yellow-intense-fg ansi-bold">                          (self, other))
-</span><span class="ansi-green-fg">    565</span> 
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shapes (64, 22, 100) and (?, ?) are not compatible
-
-During handling of the above exception, another exception occurred:
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-30-e2e4a404482d&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">     35</span> DON<span class="ansi-red-fg">&#39;</span>T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
-<span class="ansi-green-fg">     36</span> &#34;&#34;&#34;
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 37</span><span class="ansi-yellow-intense-fg ansi-bold"> </span>tests<span class="ansi-yellow-intense-fg ansi-bold">.</span>test_seq2seq_model<span class="ansi-yellow-intense-fg ansi-bold">(</span>seq2seq_model<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\DL\RNN\deep-learning\language-translation\problem_unittests.py</span> in <span class="ansi-cyan-fg">test_seq2seq_model</span><span class="ansi-blue-intense-fg ansi-bold">(seq2seq_model)</span>
-<span class="ansi-green-fg">    243</span>                                                    rnn_size<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">    244</span>                                                    num_layers<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 245</span><span class="ansi-yellow-intense-fg ansi-bold">                                                    target_vocab_to_int)
-</span><span class="ansi-green-fg">    246</span> 
-<span class="ansi-green-fg">    247</span>         <span class="ansi-red-intense-fg ansi-bold"># input_data, target_data, keep_prob, batch_size, sequence_length,</span>
-
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-30-e2e4a404482d&gt;</span> in <span class="ansi-cyan-fg">seq2seq_model</span><span class="ansi-blue-intense-fg ansi-bold">(input_data, target_data, keep_prob, batch_size, source_sequence_length, target_sequence_length, max_target_sentence_length, source_vocab_size, target_vocab_size, enc_embedding_size, dec_embedding_size, rnn_size, num_layers, target_vocab_to_int)</span>
-<span class="ansi-green-fg">     28</span> 
-<span class="ansi-green-fg">     29</span>     train_out, infer_out = decoding_layer(dec_input, enc_state, target_sequence_length, max_target_sentence_length, rnn_size, num_layers,
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 30</span><span class="ansi-yellow-intense-fg ansi-bold">                    target_vocab_to_int, target_vocab_size, batch_size, keep_prob, dec_embedding_size)
-</span><span class="ansi-green-fg">     31</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> train_out<span class="ansi-yellow-intense-fg ansi-bold">,</span> infer_out
-<span class="ansi-green-fg">     32</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-27-92a452c6e326&gt;</span> in <span class="ansi-cyan-fg">decoding_layer</span><span class="ansi-blue-intense-fg ansi-bold">(dec_input, encoder_state, target_sequence_length, max_target_sequence_length, rnn_size, num_layers, target_vocab_to_int, target_vocab_size, batch_size, keep_prob, decoding_embedding_size)</span>
-<span class="ansi-green-fg">     39</span>     infer_logits = decoding_layer_infer(encoder_state, dec_rnn, dec_embed, target_vocab_to_int[&#39;&lt;GO&gt;&#39;], 
-<span class="ansi-green-fg">     40</span>                                         target_vocab_to_int<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-blue-intense-fg ansi-bold">&#39;&lt;EOS&gt;&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> max_target_sequence_length<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 41</span><span class="ansi-yellow-intense-fg ansi-bold">                                         target_vocab_size, output_layer, batch_size, keep_prob)
-</span><span class="ansi-green-fg">     42</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> train_logits<span class="ansi-yellow-intense-fg ansi-bold">,</span> infer_logits
-<span class="ansi-green-fg">     43</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-20-9da2c043077d&gt;</span> in <span class="ansi-cyan-fg">decoding_layer_infer</span><span class="ansi-blue-intense-fg ansi-bold">(encoder_state, dec_cell, dec_embeddings, start_of_sequence_id, end_of_sequence_id, max_target_sequence_length, vocab_size, output_layer, batch_size, keep_prob)</span>
-<span class="ansi-green-fg">     27</span> 
-<span class="ansi-green-fg">     28</span>     inference_output, sample_id = tf.contrib.seq2seq.dynamic_decode(inference_decoder, impute_finished=True,
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 29</span><span class="ansi-yellow-intense-fg ansi-bold">                                                          maximum_iterations = max_target_sequence_length)
-</span><span class="ansi-green-fg">     30</span> 
-<span class="ansi-green-fg">     31</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> inference_output
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\decoder.py</span> in <span class="ansi-cyan-fg">dynamic_decode</span><span class="ansi-blue-intense-fg ansi-bold">(decoder, output_time_major, impute_finished, maximum_iterations, parallel_iterations, swap_memory, scope)</span>
-<span class="ansi-green-fg">    276</span>         ],
-<span class="ansi-green-fg">    277</span>         parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">=</span>parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 278</span><span class="ansi-yellow-intense-fg ansi-bold">         swap_memory=swap_memory)
-</span><span class="ansi-green-fg">    279</span> 
-<span class="ansi-green-fg">    280</span>     final_outputs_ta <span class="ansi-yellow-intense-fg ansi-bold">=</span> res<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">while_loop</span><span class="ansi-blue-intense-fg ansi-bold">(cond, body, loop_vars, shape_invariants, parallel_iterations, back_prop, swap_memory, name)</span>
-<span class="ansi-green-fg">   2621</span>     context <span class="ansi-yellow-intense-fg ansi-bold">=</span> WhileContext<span class="ansi-yellow-intense-fg ansi-bold">(</span>parallel_iterations<span class="ansi-yellow-intense-fg ansi-bold">,</span> back_prop<span class="ansi-yellow-intense-fg ansi-bold">,</span> swap_memory<span class="ansi-yellow-intense-fg ansi-bold">,</span> name<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2622</span>     ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>add_to_collection<span class="ansi-yellow-intense-fg ansi-bold">(</span>ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>GraphKeys<span class="ansi-yellow-intense-fg ansi-bold">.</span>WHILE_CONTEXT<span class="ansi-yellow-intense-fg ansi-bold">,</span> context<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2623</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>result <span class="ansi-yellow-intense-fg ansi-bold">=</span> context<span class="ansi-yellow-intense-fg ansi-bold">.</span>BuildLoop<span class="ansi-yellow-intense-fg ansi-bold">(</span>cond<span class="ansi-yellow-intense-fg ansi-bold">,</span> body<span class="ansi-yellow-intense-fg ansi-bold">,</span> loop_vars<span class="ansi-yellow-intense-fg ansi-bold">,</span> shape_invariants<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2624</span>     <span class="ansi-green-intense-fg ansi-bold">return</span> result
-<span class="ansi-green-fg">   2625</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">BuildLoop</span><span class="ansi-blue-intense-fg ansi-bold">(self, pred, body, loop_vars, shape_invariants)</span>
-<span class="ansi-green-fg">   2454</span>       self<span class="ansi-yellow-intense-fg ansi-bold">.</span>Enter<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2455</span>       original_body_result, exit_vars = self._BuildLoop(
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2456</span><span class="ansi-yellow-intense-fg ansi-bold">           pred, body, original_loop_vars, loop_vars, shape_invariants)
-</span><span class="ansi-green-fg">   2457</span>     <span class="ansi-green-intense-fg ansi-bold">finally</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">   2458</span>       self<span class="ansi-yellow-intense-fg ansi-bold">.</span>Exit<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\control_flow_ops.py</span> in <span class="ansi-cyan-fg">_BuildLoop</span><span class="ansi-blue-intense-fg ansi-bold">(self, pred, body, original_loop_vars, loop_vars, shape_invariants)</span>
-<span class="ansi-green-fg">   2404</span>         structure<span class="ansi-yellow-intense-fg ansi-bold">=</span>original_loop_vars<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">   2405</span>         flat_sequence=vars_for_body_with_tensor_arrays)
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 2406</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>body_result <span class="ansi-yellow-intense-fg ansi-bold">=</span> body<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">*</span>packed_vars_for_body<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">   2407</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> <span class="ansi-green-intense-fg ansi-bold">not</span> nest<span class="ansi-yellow-intense-fg ansi-bold">.</span>is_sequence<span class="ansi-yellow-intense-fg ansi-bold">(</span>body_result<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">   2408</span>       body_result <span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-yellow-intense-fg ansi-bold">[</span>body_result<span class="ansi-yellow-intense-fg ansi-bold">]</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\decoder.py</span> in <span class="ansi-cyan-fg">body</span><span class="ansi-blue-intense-fg ansi-bold">(time, outputs_ta, state, inputs, finished)</span>
-<span class="ansi-green-fg">    229</span>       &#34;&#34;&#34;
-<span class="ansi-green-fg">    230</span>       (next_outputs, decoder_state, next_inputs,
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 231</span><span class="ansi-yellow-intense-fg ansi-bold">        decoder_finished) = decoder.step(time, inputs, state)
-</span><span class="ansi-green-fg">    232</span>       next_finished <span class="ansi-yellow-intense-fg ansi-bold">=</span> math_ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>logical_or<span class="ansi-yellow-intense-fg ansi-bold">(</span>decoder_finished<span class="ansi-yellow-intense-fg ansi-bold">,</span> finished<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    233</span>       <span class="ansi-green-intense-fg ansi-bold">if</span> maximum_iterations <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">not</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\seq2seq\python\ops\basic_decoder.py</span> in <span class="ansi-cyan-fg">step</span><span class="ansi-blue-intense-fg ansi-bold">(self, time, inputs, state, name)</span>
-<span class="ansi-green-fg">    138</span>     &#34;&#34;&#34;
-<span class="ansi-green-fg">    139</span>     <span class="ansi-green-intense-fg ansi-bold">with</span> ops<span class="ansi-yellow-intense-fg ansi-bold">.</span>name_scope<span class="ansi-yellow-intense-fg ansi-bold">(</span>name<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-blue-intense-fg ansi-bold">&#34;BasicDecoderStep&#34;</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-yellow-intense-fg ansi-bold">(</span>time<span class="ansi-yellow-intense-fg ansi-bold">,</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 140</span><span class="ansi-yellow-intense-fg ansi-bold">       </span>cell_outputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> cell_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    141</span>       <span class="ansi-green-intense-fg ansi-bold">if</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_output_layer <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">not</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    142</span>         cell_outputs <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_output_layer<span class="ansi-yellow-intense-fg ansi-bold">(</span>cell_outputs<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    951</span>                 state, [0, cur_state_pos], [-1, cell.state_size])
-<span class="ansi-green-fg">    952</span>             cur_state_pos <span class="ansi-yellow-intense-fg ansi-bold">+=</span> cell<span class="ansi-yellow-intense-fg ansi-bold">.</span>state_size
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 953</span><span class="ansi-yellow-intense-fg ansi-bold">           </span>cur_inp<span class="ansi-yellow-intense-fg ansi-bold">,</span> new_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>cur_inp<span class="ansi-yellow-intense-fg ansi-bold">,</span> cur_state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    954</span>           new_states<span class="ansi-yellow-intense-fg ansi-bold">.</span>append<span class="ansi-yellow-intense-fg ansi-bold">(</span>new_state<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    955</span>     new_states = (tuple(new_states) if self._state_is_tuple else
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    711</span>                              self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_recurrent_input_noise<span class="ansi-yellow-intense-fg ansi-bold">,</span>
-<span class="ansi-green-fg">    712</span>                              self._input_keep_prob)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 713</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>output<span class="ansi-yellow-intense-fg ansi-bold">,</span> new_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_cell<span class="ansi-yellow-intense-fg ansi-bold">(</span>inputs<span class="ansi-yellow-intense-fg ansi-bold">,</span> state<span class="ansi-yellow-intense-fg ansi-bold">,</span> scope<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    714</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> _should_dropout<span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">.</span>_state_keep_prob<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    715</span>       new_state = self._dropout(new_state, &#34;state&#34;,
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\contrib\rnn\python\ops\core_rnn_cell_impl.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-intense-fg ansi-bold">(self, inputs, state, scope)</span>
-<span class="ansi-green-fg">    391</span> 
-<span class="ansi-green-fg">    392</span>     dtype <span class="ansi-yellow-intense-fg ansi-bold">=</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">.</span>dtype
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 393</span><span class="ansi-yellow-intense-fg ansi-bold">     </span>input_size <span class="ansi-yellow-intense-fg ansi-bold">=</span> inputs<span class="ansi-yellow-intense-fg ansi-bold">.</span>get_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>with_rank<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-cyan-intense-fg ansi-bold">2</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
-<span class="ansi-green-fg">    394</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> input_size<span class="ansi-yellow-intense-fg ansi-bold">.</span>value <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    395</span>       <span class="ansi-green-intense-fg ansi-bold">raise</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#34;Could not infer input size from inputs.get_shape()[-1]&#34;</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-intense-fg ansi-bold">C:\Users\lkor\AppData\Local\Continuum\Anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\tensor_shape.py</span> in <span class="ansi-cyan-fg">with_rank</span><span class="ansi-blue-intense-fg ansi-bold">(self, rank)</span>
-<span class="ansi-green-fg">    633</span>       <span class="ansi-green-intense-fg ansi-bold">return</span> self<span class="ansi-yellow-intense-fg ansi-bold">.</span>merge_with<span class="ansi-yellow-intense-fg ansi-bold">(</span>unknown_shape<span class="ansi-yellow-intense-fg ansi-bold">(</span>ndims<span class="ansi-yellow-intense-fg ansi-bold">=</span>rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    634</span>     <span class="ansi-green-intense-fg ansi-bold">except</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 635</span><span class="ansi-yellow-intense-fg ansi-bold">       </span><span class="ansi-green-intense-fg ansi-bold">raise</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#34;Shape %s must have rank %d&#34;</span> <span class="ansi-yellow-intense-fg ansi-bold">%</span> <span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">,</span> rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">    636</span> 
-<span class="ansi-green-fg">    637</span>   <span class="ansi-green-intense-fg ansi-bold">def</span> with_rank_at_least<span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">,</span> rank<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-red-intense-fg ansi-bold">ValueError</span>: Shape (64, 22, 100) must have rank 2</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Tests Passed
+</pre>
 </div>
 </div>
 
@@ -12918,25 +12663,25 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of Epochs</span>
-<span class="n">epochs</span> <span class="o">=</span> <span class="kc">None</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">##### Number of Epochs</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="c1"># Batch Size</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">256</span>
 <span class="c1"># RNN Size</span>
-<span class="n">rnn_size</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">rnn_size</span> <span class="o">=</span> <span class="mi">256</span>
 <span class="c1"># Number of Layers</span>
-<span class="n">num_layers</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">num_layers</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="c1"># Embedding Size</span>
-<span class="n">encoding_embedding_size</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">decoding_embedding_size</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">encoding_embedding_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">decoding_embedding_size</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="c1"># Learning Rate</span>
-<span class="n">learning_rate</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span>
 <span class="c1"># Dropout Keep Probability</span>
-<span class="n">keep_probability</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">display_step</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">keep_probability</span> <span class="o">=</span> <span class="mf">0.6</span>
+<span class="n">display_step</span> <span class="o">=</span> <span class="mi">50</span>
 </pre></div>
 
 </div>
@@ -12956,7 +12701,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -13027,7 +12772,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -13081,7 +12826,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -13169,6 +12914,72 @@ During handling of the above exception, another exception occurred:
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch   0 Batch   50/538 - Train Accuracy: 0.4402, Validation Accuracy: 0.4790, Loss: 2.3354
+Epoch   0 Batch  100/538 - Train Accuracy: 0.4826, Validation Accuracy: 0.5247, Loss: 1.8125
+Epoch   0 Batch  150/538 - Train Accuracy: 0.5217, Validation Accuracy: 0.5446, Loss: 1.5412
+Epoch   0 Batch  200/538 - Train Accuracy: 0.5168, Validation Accuracy: 0.5478, Loss: 1.3512
+Epoch   0 Batch  250/538 - Train Accuracy: 0.5303, Validation Accuracy: 0.5495, Loss: 1.1764
+Epoch   0 Batch  300/538 - Train Accuracy: 0.5848, Validation Accuracy: 0.5778, Loss: 1.0008
+Epoch   0 Batch  350/538 - Train Accuracy: 0.5913, Validation Accuracy: 0.5850, Loss: 0.9655
+Epoch   0 Batch  400/538 - Train Accuracy: 0.5828, Validation Accuracy: 0.5877, Loss: 0.8741
+Epoch   0 Batch  450/538 - Train Accuracy: 0.6125, Validation Accuracy: 0.5998, Loss: 0.8502
+Epoch   0 Batch  500/538 - Train Accuracy: 0.6165, Validation Accuracy: 0.6039, Loss: 0.7140
+Epoch   1 Batch   50/538 - Train Accuracy: 0.5990, Validation Accuracy: 0.6033, Loss: 0.7116
+Epoch   1 Batch  100/538 - Train Accuracy: 0.6188, Validation Accuracy: 0.6266, Loss: 0.6503
+Epoch   1 Batch  150/538 - Train Accuracy: 0.6488, Validation Accuracy: 0.6484, Loss: 0.6085
+Epoch   1 Batch  200/538 - Train Accuracy: 0.6490, Validation Accuracy: 0.6580, Loss: 0.5714
+Epoch   1 Batch  250/538 - Train Accuracy: 0.6541, Validation Accuracy: 0.6742, Loss: 0.5442
+Epoch   1 Batch  300/538 - Train Accuracy: 0.6669, Validation Accuracy: 0.6738, Loss: 0.5046
+Epoch   1 Batch  350/538 - Train Accuracy: 0.6970, Validation Accuracy: 0.7005, Loss: 0.4975
+Epoch   1 Batch  400/538 - Train Accuracy: 0.7000, Validation Accuracy: 0.7120, Loss: 0.4582
+Epoch   1 Batch  450/538 - Train Accuracy: 0.7377, Validation Accuracy: 0.7335, Loss: 0.4248
+Epoch   1 Batch  500/538 - Train Accuracy: 0.7795, Validation Accuracy: 0.7511, Loss: 0.3385
+Epoch   2 Batch   50/538 - Train Accuracy: 0.7902, Validation Accuracy: 0.7903, Loss: 0.3153
+Epoch   2 Batch  100/538 - Train Accuracy: 0.8260, Validation Accuracy: 0.8114, Loss: 0.2860
+Epoch   2 Batch  150/538 - Train Accuracy: 0.8467, Validation Accuracy: 0.8434, Loss: 0.2490
+Epoch   2 Batch  200/538 - Train Accuracy: 0.8598, Validation Accuracy: 0.8310, Loss: 0.2272
+Epoch   2 Batch  250/538 - Train Accuracy: 0.8900, Validation Accuracy: 0.8604, Loss: 0.2123
+Epoch   2 Batch  300/538 - Train Accuracy: 0.8620, Validation Accuracy: 0.8596, Loss: 0.1906
+Epoch   2 Batch  350/538 - Train Accuracy: 0.8914, Validation Accuracy: 0.8750, Loss: 0.1986
+Epoch   2 Batch  400/538 - Train Accuracy: 0.8817, Validation Accuracy: 0.8631, Loss: 0.1658
+Epoch   2 Batch  450/538 - Train Accuracy: 0.8836, Validation Accuracy: 0.8922, Loss: 0.1669
+Epoch   2 Batch  500/538 - Train Accuracy: 0.8999, Validation Accuracy: 0.8723, Loss: 0.1224
+Epoch   3 Batch   50/538 - Train Accuracy: 0.8934, Validation Accuracy: 0.8885, Loss: 0.1180
+Epoch   3 Batch  100/538 - Train Accuracy: 0.9117, Validation Accuracy: 0.8968, Loss: 0.1090
+Epoch   3 Batch  150/538 - Train Accuracy: 0.9154, Validation Accuracy: 0.8913, Loss: 0.1079
+Epoch   3 Batch  200/538 - Train Accuracy: 0.9266, Validation Accuracy: 0.8938, Loss: 0.1015
+Epoch   3 Batch  250/538 - Train Accuracy: 0.9260, Validation Accuracy: 0.8963, Loss: 0.0934
+Epoch   3 Batch  300/538 - Train Accuracy: 0.9129, Validation Accuracy: 0.9141, Loss: 0.1034
+Epoch   3 Batch  350/538 - Train Accuracy: 0.8917, Validation Accuracy: 0.8805, Loss: 0.1155
+Epoch   3 Batch  400/538 - Train Accuracy: 0.9089, Validation Accuracy: 0.9093, Loss: 0.0918
+Epoch   3 Batch  450/538 - Train Accuracy: 0.9051, Validation Accuracy: 0.9022, Loss: 0.0973
+Epoch   3 Batch  500/538 - Train Accuracy: 0.9432, Validation Accuracy: 0.9174, Loss: 0.0680
+Epoch   4 Batch   50/538 - Train Accuracy: 0.9098, Validation Accuracy: 0.9292, Loss: 0.0752
+Epoch   4 Batch  100/538 - Train Accuracy: 0.9375, Validation Accuracy: 0.9247, Loss: 0.0625
+Epoch   4 Batch  150/538 - Train Accuracy: 0.9418, Validation Accuracy: 0.9345, Loss: 0.0625
+Epoch   4 Batch  200/538 - Train Accuracy: 0.9449, Validation Accuracy: 0.9235, Loss: 0.0641
+Epoch   4 Batch  250/538 - Train Accuracy: 0.9373, Validation Accuracy: 0.9247, Loss: 0.0577
+Epoch   4 Batch  300/538 - Train Accuracy: 0.9258, Validation Accuracy: 0.9251, Loss: 0.0612
+Epoch   4 Batch  350/538 - Train Accuracy: 0.9412, Validation Accuracy: 0.9318, Loss: 0.0725
+Epoch   4 Batch  400/538 - Train Accuracy: 0.9390, Validation Accuracy: 0.9339, Loss: 0.0650
+Epoch   4 Batch  450/538 - Train Accuracy: 0.9353, Validation Accuracy: 0.9336, Loss: 0.0814
+Epoch   4 Batch  500/538 - Train Accuracy: 0.9590, Validation Accuracy: 0.9276, Loss: 0.0461
+Model Trained and Saved
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
@@ -13182,7 +12993,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -13208,7 +13019,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -13247,7 +13058,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">sentence_to_seq</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">vocab_to_int</span><span class="p">):</span>
@@ -13258,7 +13069,8 @@ During handling of the above exception, another exception occurred:
 <span class="sd">    :return: List of word ids</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: Implement Function</span>
-    <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">vocab_to_int</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">vocab_to_int</span><span class="p">[</span><span class="s1">&#39;&lt;UNK&gt;&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+    
 
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -13268,6 +13080,22 @@ During handling of the above exception, another exception occurred:
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Tests Passed
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -13284,7 +13112,7 @@ During handling of the above exception, another exception occurred:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">translate_sentence</span> <span class="o">=</span> <span class="s1">&#39;he saw a old yellow truck .&#39;</span>
@@ -13322,6 +13150,29 @@ During handling of the above exception, another exception occurred:
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>INFO:tensorflow:Restoring parameters from checkpoints/dev
+Input
+  Word Ids:      [105, 201, 210, 14, 142, 28, 221]
+  English Words: [&#39;he&#39;, &#39;saw&#39;, &#39;a&#39;, &#39;old&#39;, &#39;yellow&#39;, &#39;truck&#39;, &#39;.&#39;]
+
+Prediction
+  Word Ids:      [182, 180, 170, 298, 93, 105, 205, 274, 1]
+  French Words: il a vu le vieux camion jaune . &lt;EOS&gt;
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
